@@ -1,0 +1,45 @@
+from os.path import exists
+
+if exists("./.test_flag"):
+    DiscordToken = "Unstable bot token"
+else:
+    DiscordToken = "Normal Bot Token"
+owners = [1236667927944761396, 1018144363555069952, 1263441492882755635]
+DiscordBot_name = "Puppeteer"
+Imgur_ClientID = "f1d216554327a6d"
+DiscordBot_description = """Heya, im puppeteer, a discord bot made by i_am_called_glitchy.
+Originally just reverie's toy, this bot has been remade and coded to be useful for anyone to use, user or guild install :)"""
+DiscordBot_subdescriptions = {
+    "Engine": "Made with python 3.12.6 64-bit, pycord, irrvlo's API for some stuff, SherrifCarry's kirkajs (forked for python), lukeskywalk's api, and others...",
+    "Legal Info": "This bot is not associated with kirka.io, irrvlo, or any other possibly implied party.\nThis bot has been made as a hobby project and all complaints should be directed to i_am_called_glitchy directly.\n-# dont bother with my email i dont check that.",
+}
+glitchyKirkaBadges = [
+    "https://i.imgur.com/JhMlisg.png",
+    "https://i.imgur.com/PePV8tf.png",
+    "https://i.imgur.com/hpqf68p.png",
+    "https://i.imgur.com/QbyX7XV.png",
+]
+KirkaBadges = {
+    "Reverie": "https://i.imgur.com/PePV8tf.png",
+    "Glitchy": "https://i.imgur.com/JhMlisg.png",
+    "ReverieLeader": "https://i.imgur.com/hpqf68p.png",
+    "Pdev": "https://i.imgur.com/QbyX7XV.png",
+    "poop": "https://cdn3.emoji.gg/emojis/9721-dnd-d20.png",
+}
+KirkaBackgrounds = {
+    "Skynet": "https://i.imgur.com/NxItcCc.png",
+    "Glitchedbg": "https://i.imgur.com/IZ2tC5C.jpeg",
+    # "TTV": "https://i.imgur.com/MJ13qJi.png"
+    "TTV": "https://pbs.twimg.com/profile_banners/1761487730016673792/1727551267/1500x500",
+    "ttvbro": "https://cdn.discordapp.com/avatars/1258173648989327361/ec62376e6a0c061f2c4ca5ab07c805ca.png?size=1024",
+}
+UserAgent = ":) this is a bot btw"
+
+
+class DebugException(BaseException):
+    def __init__(self, message, *args, **kwargs):
+        self.message = message
+        super().__init__(*args, **kwargs)
+
+
+# :D Welcome to puppeteer's development team!

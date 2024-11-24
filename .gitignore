@@ -1,0 +1,13 @@
+.ipynb_checkpoints/
+__pycache__
+./api.js
+**/__pycache__/
+cogs/__pycache__
+cogs/DontLook.py
+token.txt
+.test_flag
+include
+share
+terminator.code-workspace
+cookies
+yt_downloads
