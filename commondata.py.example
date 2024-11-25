@@ -4,7 +4,7 @@ if exists("./.test_flag"):
     DiscordToken = "Unstable bot token"
 else:
     DiscordToken = "Normal Bot Token"
-owners = [1236667927944761396, 1018144363555069952, 1263441492882755635]
+owners = [1236667927944761396, 1018144363555069952, 1263441492882755635, 1169111190824308768]
 DiscordBot_name = "Puppeteer"
 Imgur_ClientID = "f1d216554327a6d"
 DiscordBot_description = """Heya, im puppeteer, a discord bot made by i_am_called_glitchy.
