@@ -1,4 +1,4 @@
-## _Hello, this is puppeteer's github repository! I was made by [@Glitchy]() And i'm a discord and utility bot for kirka.io!_
+## _Hello, this is puppeteer's github repository! I was made by [@Glitchy]() And i'm a discord Bot/app and utility bot for kirka.io!_
 
 **Commands!**
 
