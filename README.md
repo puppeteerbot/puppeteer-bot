@@ -68,16 +68,16 @@
 `Glitchy` 
 
 **Contribution:** Main developer of the bot
-Role: `Owner/Lead Dev,` `.Dev as 500`
+Role: `Owner/Lead Dev,` `.dev 500`
 
 `PoopooumgoodYT` 
 
 **Contribution:** suggested `(.trades <Id>)` `(.devs <devName>)` `(.clanwar)` `(.cwrewards)`
-Role: `API maintainer,` `suggester,` `.Dev as PPUG,`
+Role: `API maintainer,` `suggester,` `.dev PPUG,`
 
 `Skywalk`
 
-**Contribution:** Created [Kirka.lukeskywalk/Trades.json](https://kirka.lukeskywalk.com/trades.json) and i also used code from trades comparer `(.compare_trade)` `.Dev as Sky,`
+**Contribution:** Created [Kirka.lukeskywalk/Trades.json](https://kirka.lukeskywalk.com/trades.json) and i also used code from trades comparer `(.compare_trade)` `.dev sky,`
 Role: API Maintainer
 
 `Irrvlo`
@@ -88,4 +88,4 @@ Role: API Maintainer
 `CarrySheriff`
 
 **Contribution:** https://raw.githubusercontent.com/SheriffCarry/KirkaSkins/main/[Type]/[Name]-render.png used in `(.t)` `(.r)`
-Role: image Maintainer
+Role: Image repo maintainer, api writer
