@@ -16,6 +16,38 @@ import re
 from bson import ObjectId
 import datetime
 from math import ceil
+from datetime import timedelta
+
+
+def parse_duration(duration):
+    print(f"Parsing duration string: {duration}")
+    units = {"w": "weeks", "d": "days", "h": "hours", "m": "minutes", "s": "seconds"}
+
+    duration_dict = {}
+    current_number = ""
+
+    for char in duration:
+        if char.isdigit():
+            current_number += char
+        elif char in units:
+            if current_number:
+                duration_dict[units[char]] = int(current_number)
+                current_number = ""
+        else:
+            print(f"Invalid character in duration string: {char}")
+            return None  # Invalid character found
+
+    if current_number:  # If there's a trailing number without a unit
+        print(f"Trailing number without unit in duration string: {current_number}")
+        return None
+
+    try:
+        result = timedelta(**duration_dict)
+        print(f"Successfully parsed duration string to timedelta: {result}")
+        return result
+    except Exception as e:
+        print(f"Error creating timedelta from duration dict {duration_dict}: {e}")
+        return None
 
 
 class HumanReadablePrinter(StrPrinter):
@@ -889,6 +921,39 @@ class Utility(commands.Cog):
 
         # Send the initial embed and assign the message to the view
         view.message = await ctx.send(embed=embed, view=view)
+
+    @commands.slash_command(
+        name="remindme",
+        description="Set a reminder for yourself.",
+        integration_types={
+            discord.IntegrationType.user_install,
+            discord.IntegrationType.guild_install,
+        },
+    )
+    async def remindme_slash(
+        self, ctx: discord.ApplicationContext, duration: str, reminder: str
+    ):
+        """
+        Set a reminder.
+        Args:
+            duration (str): Duration string (e.g., "1h", "30m").
+            reminder (str): Reminder text.
+        """
+        duration_td = parse_duration(duration)
+        if not duration_td:
+            await ctx.respond(
+                "Invalid duration format! Use something like '1h30m' or '2d'.",
+                ephemeral=True,
+            )
+            return
+
+        await ctx.respond(f"Reminder set for {duration}: '{reminder}'", ephemeral=True)
+
+        await asyncio.sleep(duration_td.total_seconds())
+
+        await ctx.author.send(
+            f"Hey {ctx.author.mention}, you asked to be reminded about ```{reminder}``` {duration} ago!"
+        )
 
 
 todo_commands = discord.SlashCommandGroup("todo", "Manage your todo list")
