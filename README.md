@@ -77,7 +77,7 @@ Role: `API maintainer,` `suggester,` `.Dev as PPUG,`
 
 `Skywalk`
 
-**Contribution:** Created [Kirka.lukeskywalk/Trades.json](https://kirka.lukeskywalk.com/trades.json) and i also used code from trades comparer `(.compare_trade)`
+**Contribution:** Created [Kirka.lukeskywalk/Trades.json](https://kirka.lukeskywalk.com/trades.json) and i also used code from trades comparer `(.compare_trade)` `.Dev as Sky,`
 Role: API Maintainer
 
 `Irrvlo`
