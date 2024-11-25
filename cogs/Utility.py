@@ -956,7 +956,14 @@ class Utility(commands.Cog):
         )
 
 
-todo_commands = discord.SlashCommandGroup("todo", "Manage your todo list")
+todo_commands = discord.SlashCommandGroup(
+    "todo",
+    "Manage your todo list",
+    integration_types={
+        discord.IntegrationType.user_install,
+        discord.IntegrationType.guild_install,
+    },
+)
 
 
 async def todo_logic(ctx, mode=None, *, arguments=None):
@@ -1003,14 +1010,7 @@ async def todo_logic(ctx, mode=None, *, arguments=None):
         return "text", "Invalid mode. Please use 'list', 'add', or 'remove'."
 
 
-@todo_commands.command(
-    name="list",
-    description="List your todo items",
-    integration_types={
-        discord.IntegrationType.user_install,
-        discord.IntegrationType.guild_install,
-    },
-)
+@todo_commands.command(name="list", description="List your todo items")
 async def todo_slash_list(ctx):
     """List your todo items"""
     result = await todo_logic(ctx, mode="list")
@@ -1026,14 +1026,7 @@ async def todo_slash_list(ctx):
         await ctx.respond(result[1])
 
 
-@todo_commands.command(
-    name="add",
-    description="Add a todo item",
-    integration_types={
-        discord.IntegrationType.user_install,
-        discord.IntegrationType.guild_install,
-    },
-)
+@todo_commands.command(name="add", description="Add a todo item")
 async def todo_slash_add(
     ctx,
     *,
@@ -1049,14 +1042,7 @@ async def todo_slash_add(
         raise ValueError("Invalid mode, glitchy get your ass here")
 
 
-@todo_commands.command(
-    name="remove",
-    description="Remove a todo item",
-    integration_types={
-        discord.IntegrationType.user_install,
-        discord.IntegrationType.guild_install,
-    },
-)
+@todo_commands.command(name="remove", description="Remove a todo item")
 async def todo_slash_remove(
     ctx,
     arguments: discord.Option(
