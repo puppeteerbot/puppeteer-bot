@@ -83,7 +83,7 @@ Role: API Maintainer
 
 `Irrvlo`
 
-**Contribution:** [kirka.Io/api/](https://kirka.io)
+**Contribution:** [kirka.irrvlo.xyz./](https://kirka.irrvlo.xyz)
 Role: API Maintainer
 
 `CarrySheriff`
