@@ -395,6 +395,8 @@ def generate_profile_image(data, badges=None, bgimage=None):
         f"Role: {data['role']}",
         f"Scores: {score:,}",
         f"Created: {data['createdAt']}",
+        f"Coins: {data['coins']}",
+        f"Diamonds: {data['diamonds']}",
     ]
     for i in textstuff:
         # draw a nice rounded box around it and pack it using both x and y space
@@ -410,7 +412,7 @@ def generate_profile_image(data, badges=None, bgimage=None):
 
     # Draw badges
     badge_x = 30
-    badge_y = 380
+    badge_y = 400
     badge_size = 48
     print(data["role"])
     if data["role"] in ["VERIFIED", "ADMIN", "MODERATOR"]:
@@ -450,10 +452,10 @@ def generate_profile_image(data, badges=None, bgimage=None):
                 print(f"Failed to load badge from {badge_url}: {e}")
                 raise e
 
-    x = 400
-    y = 377
+    x = 25
+    y = 450
     xp_bar_width = 370
-    xp_bar_height = 50
+    xp_bar_height = 48
     xp_bar_border = 5
     xp_bar_fill_color = (30, 30, 30)
     xp_bar_progress_color = "red"
@@ -477,12 +479,18 @@ def generate_profile_image(data, badges=None, bgimage=None):
     )
     print(f"DEBUG: XP bar drawn")
     draw.text(
-        (x + xp_bar_border - 150, y + xp_bar_border + xp_bar_height + 20),
+        (x + xp_bar_border - 150, y + xp_bar_border + xp_bar_height),
         f"Progress: {int(scale*100)}%, Xp until next: {xpUntilNextLevel - xpSinceLastLevel:,}",
         font=text_font,
         fill=text_color,
         stroke_width=2,
         stroke_fill="black",
+    )
+    draw.text(
+        (410, 464),
+        f"Estimated Playtime: {data['estimatedTimePlayed']}",
+        font=text_font,
+        fill=text_color,
     )
 
     # Save the image

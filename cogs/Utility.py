@@ -792,9 +792,7 @@ class Utility(commands.Cog):
             content = tag["content"]
             embed = discord.Embed(title=f"Tag: {name}", color=discord.Color.random())
             embed.set_footer(text=f"Created by: {self.bot.get_user(tag['creator_id'])}")
-            await ctx.send(
-                content, embed=embed, allowed_mentions=discord.AllowedMentions.none
-            )
+            await ctx.send(content, embed=embed)
         else:
             await ctx.send("Tag not found.")
 
