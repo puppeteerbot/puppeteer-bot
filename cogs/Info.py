@@ -143,6 +143,11 @@ To install me as a user app, click [Here!](https://discord.com/oauth2/authorize?
                 "Matches": ["ppg", "ppgyt", "poop", "ppug", "ppugyt"],
                 "URL": "https://juicepoopooumgood.github.io/Api-guy/1169111190824308768/index.json",
             },
+            {
+                "Name": "Skywalk",
+                "Matches": ["Sky", "Skywalk", "Walker", "skywalker", "Apiguy"],
+                "URL": "https://juicepoopooumgood.github.io/Api-guy/Sky/index.json",
+            },
         ]
         if dev:
             dev_table_entry = None
