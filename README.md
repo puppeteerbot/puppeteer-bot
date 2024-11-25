@@ -1,4 +1,4 @@
-_Hello i am Puppeteer I was made by [@Glitchy]() And i am for You're Discord Needs!_
+## _Hello, this is puppeteer's github repository! I was made by [@Glitchy]() And i'm a discord and utility bot for kirka.io!_
 
 **Commands!**
 
@@ -57,3 +57,9 @@ _Hello i am Puppeteer I was made by [@Glitchy]() And i am for You're Discord Nee
 
 `.devs`
 `.info`
+
+# Instructions for local usage:
+- Clone the repo
+- Activate the venv
+- Fill out commondata.py as per the example.
+- Run main.py
