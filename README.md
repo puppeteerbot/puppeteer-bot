@@ -60,6 +60,7 @@
 
 # Instructions for local usage:
 - Clone the repo
-- Activate the venv
+- Create a venv (optional)
+- Install dependencies from requirements.txt
 - Fill out commondata.py as per the example.
 - Run main.py

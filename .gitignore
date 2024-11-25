@@ -12,3 +12,8 @@ terminator.code-workspace
 cookies
 yt_downloads
 commondata.py
+bin
+lib
+lib64
+include
+pyvenv.cfg
