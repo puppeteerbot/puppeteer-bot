@@ -58,14 +58,7 @@
 `.devs`
 `.info`
 
-# Instructions for local usage:
-- Clone the repo
-- Create a venv (optional)
-- Install dependencies from requirements.txt
-- Fill out commondata.py as per the example.
-- Run main.py
-
-# Devs/Contributors
+**Devs/Contributors**
 `Glitchy` 
 
 **Contribution:** Main developer of the bot
@@ -90,3 +83,10 @@ Role: API Maintainer
 
 **Contribution:** https://raw.githubusercontent.com/SheriffCarry/KirkaSkins/main/[Type]/[Name]-render.png used in `(.t)` `(.r)`
 Role: Image repo maintainer, api writer
+
+
+# Instructions for local usage:
+- Clone the repo
+- Activate the venv
+- Fill out commondata.py as per the example.
+- Run main.py
