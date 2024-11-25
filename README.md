@@ -64,3 +64,29 @@
 - Install dependencies from requirements.txt
 - Fill out commondata.py as per the example.
 - Run main.py
+
+# Devs/Contributors
+`Glitchy` 
+
+**Contribution:** Main developer of the bot
+Role: `Owner/Lead Dev,` `.dev 500`
+
+`PoopooumgoodYT` 
+
+**Contribution:** suggested `(.trades <Id>)` `(.devs <devName>)` `(.clanwar)` `(.cwrewards)`
+Role: `API maintainer,` `suggester,` `.dev PPUG,`
+
+`Skywalk`
+
+**Contribution:** Created [Kirka.lukeskywalk/Trades.json](https://kirka.lukeskywalk.com/trades.json) and i also used code from trades comparer `(.compare_trade)` `.dev sky,`
+Role: API Maintainer
+
+`Irrvlo`
+
+**Contribution:** [kirka.Io/api/](https://kirka.io)
+Role: API Maintainer
+
+`CarrySheriff`
+
+**Contribution:** https://raw.githubusercontent.com/SheriffCarry/KirkaSkins/main/[Type]/[Name]-render.png used in `(.t)` `(.r)`
+Role: Image repo maintainer, api writer
