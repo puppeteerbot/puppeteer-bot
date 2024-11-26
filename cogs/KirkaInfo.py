@@ -354,17 +354,18 @@ def generate_profile_image(data, badges=None, bgimage=None):
     # Draw bio
     bio = data["bio"]
     # draw a nice rounded box around it and pack it using both x and y space
-    text_length = draw.textlength(bio, font=subtext_font) + 20
-    bio_x = 50 + clantextlength + 20  # Add some padding between clan and bio
-    # draw.rounded_rectangle((bio_x, 80, bio_x + text_length + 20, 80 + 25), fill=0x101010, radius=5)
-    draw.text(
-        (bio_x + 5, 80),
-        f"Bio: {bio}",
-        font=text_font,
-        fill=bio_color,
-        stroke_width=1,
-        stroke_fill="white",
-    )
+    if bio:
+        text_length = draw.textlength(bio, font=subtext_font) + 20
+        bio_x = 50 + clantextlength + 20  # Add some padding between clan and bio
+        # draw.rounded_rectangle((bio_x, 80, bio_x + text_length + 20, 80 + 25), fill=0x101010, radius=5)
+        draw.text(
+            (bio_x + 5, 80),
+            f"Bio: {bio}",
+            font=text_font,
+            fill=bio_color,
+            stroke_width=1,
+            stroke_fill="white",
+        )
 
     # Draw kills, deaths, wins, total games, losses, wlr, kdr, score per kill, kills per game, deaths per game, score per game
     kills = data["stats"]["kills"]
