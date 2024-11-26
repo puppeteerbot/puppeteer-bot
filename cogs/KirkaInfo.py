@@ -1153,6 +1153,47 @@ class KirkaInfo(commands.Cog):
         with open("linkedusers.json", "w") as f:
             json.dump(linkedusers, f)
 
-
+# Made by TTV
 def setup(bot):
     bot.add_cog(KirkaInfo(bot))
+    @commands.command(
+        "Lvlrewards",
+        description="Get the Lvl rewards.",
+        aliases=["rewards", "Lvlrewards", "levelrewards"],
+    )
+    async def clanwar_rewards(self, ctx):
+        await ctx.reply("Click the buttons!", view=self.lvl_rewards_view())
+
+    class cw_rewards_view(discord.ui.View):
+        def __init__(self):
+            super().__init__()
+            self.response = requests.get(
+                "https://raw.githubusercontent.com/JuIcEPoopooumgood/KirkaSkins/refs/heads/main/other/levelrewards.json"
+            )
+            self.data = self.response.json()
+            self.buttons = []
+            for entry in self.data:
+
+        async def button_callback(self, interaction: discord.Interaction):
+            print(interaction.data)
+            url = interaction.data["custom_id"]
+            response = requests.get(url)
+            data = response.json()
+            embed = discord.Embed(title="LVL rewards")
+            for item in data:
+                embed.add_field(
+                    name=f"{item['coins']} ({item['amount']})",
+                    value=f"image: [Click here](<{item['img']}>)\nReward: {item['name']}",
+                )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        global cached_prices
+        if message.author.bot:
+            return
+        if message.guild:
+            if message.guild.id in [
+                1296584026454360174
+            ]:  # we do it like this because Message does not have .get() and we dont want attr errors
+                return
