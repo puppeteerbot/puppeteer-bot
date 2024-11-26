@@ -103,6 +103,7 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
         "985CBJ": KirkaBackgrounds["TTV"],
         "MZFCNO": "https://i.imgur.com/8LVz09U.jpeg",
         "Y2OOB2": KirkaBackgrounds["ttvbro"],
+        "YUM43P": KirkaBackgrounds["Puppeteer"],
     }
     bots = ["YUM43P", "Y2OOB2"]
     if shortId in bots:
