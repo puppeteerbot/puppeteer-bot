@@ -301,6 +301,7 @@ def generate_clan_image(data, page=0):
 
 def generate_profile_image(data, badges=None, bgimage=None):
     # Create a blank image
+    print(data)
     width, height = 800, 550
     image = Image.new("RGB", (width, height), "black")
     draw = ImageDraw.Draw(image)
@@ -629,7 +630,15 @@ class KirkaInfo(commands.Cog):
             print(f"DEBUG: Member ID: {member_id}")
             # fetch the data
             api = KirkaAPI()
-            member_data = await api.get_stats_long_id(member_id)
+            try:
+                member_data = requests.get(
+                    f"https://kirka.irrvlo.xyz/_next/data/Qj7Evkvz7SgKQYk1Q4HmZ/users/{member_id}.json"
+                ).json()["pageProps"]["userData"]
+            except KeyError as e:
+                await interaction.respond(
+                    "Sorry, could not load user profile. This is a bug!", ephemeral=True
+                )
+                raise e
             # generate the image
             image = generate_profile_image(member_data)
             imageBytes = BytesIO()
