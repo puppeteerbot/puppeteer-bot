@@ -30,6 +30,8 @@ class Jokes(commands.Cog):
             await message.add_reaction("👍")
         if "goat" in message.content.lower():
             await message.reply(":goat:")
+        if "puppeteer" in message.content.lower() and message.author.id in self.owners:
+            await message.add_reaction("<:dev:1301925243459211305>")
 
 
 def setup(bot):
