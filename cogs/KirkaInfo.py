@@ -83,6 +83,7 @@ async def get_user_stats(short_id: str = None, ctx=None):
 def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command yahoo
     shortId = shortId.upper().strip("#")
     print(shortId)
+    verified_guys = ["T57L43"]
     userBadges = {
         "B0TMFC": glitchyKirkaBadges,
         "ZSE1GS": glitchyKirkaBadges,
@@ -106,6 +107,8 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
     bots = ["YUM43P", "Y2OOB2"]
     if shortId in bots:
         Role = "BOT"
+    if shortId in verified_guys:
+        Role = "VERIFIED"
 
     data_to_return = {
         "Badges": userBadges.get(
