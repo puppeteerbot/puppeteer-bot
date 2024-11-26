@@ -83,7 +83,7 @@ async def get_user_stats(short_id: str = None, ctx=None):
 def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command yahoo
     shortId = shortId.upper().strip("#")
     print(shortId)
-    verified_guys = ["T57L43"]
+    verified_guys = ["T57L43", "WERWER"]
     userBadges = {
         "B0TMFC": glitchyKirkaBadges,
         "ZSE1GS": glitchyKirkaBadges,
