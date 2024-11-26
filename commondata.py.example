@@ -30,8 +30,9 @@ KirkaBackgrounds = {
     "Skynet": "https://i.imgur.com/NxItcCc.png",
     "Glitchedbg": "https://i.imgur.com/IZ2tC5C.jpeg",
     # "TTV": "https://i.imgur.com/MJ13qJi.png"
-    "TTV": "https://pbs.twimg.com/profile_banners/1761487730016673792/1727551267/1500x500",
+    "TTV": "https://cdn.discordapp.com/avatars/1169111190824308768/5019045e780fd069aa2f36bddd72847c.png?size=1024",
     "ttvbro": "https://cdn.discordapp.com/avatars/1258173648989327361/ec62376e6a0c061f2c4ca5ab07c805ca.png?size=1024",
+    "Puppeteer": "https://cdn.discordapp.com/avatars/1293863138785103963/e4441ab3e0454e6eecae6b590d594131.png?size=1024",
 }
 UserAgent = ":) this is a bot btw"
 
