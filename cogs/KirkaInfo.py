@@ -1297,5 +1297,20 @@ class KirkaInfo(commands.Cog):
             await ctx.respond(embed=result_data)
 
 
+
+@commands.command("1293863138785103963", description="This is a test command for TTV")
+    async def sololb(self, ctx):
+        response = requests.get("https://api.kirka.io/api/leaderboard/solo")
+        data = response.json()
+        embed = discord.Embed(title="1293863138785103963 Test")
+        for i, player in enumerate(data["results"][:1]):
+            embed.add_field(
+                name=f"{i+1}. {'remainingTime' if i<3 else '' if i<8 else ''} | {player['name']}",
+                value=f"Scores: {player['scores']:,}",
+                inline=True,
+            )
+        await ctx.reply(embed=embed)
+            
+
 def setup(bot):
     bot.add_cog(KirkaInfo(bot))
