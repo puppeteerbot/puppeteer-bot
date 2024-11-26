@@ -22,6 +22,7 @@
 `.get_texture` 
 `.sololb`  
 `.trades` 
+`.lvlreward`
 
 **Moderation Commands:**
 
