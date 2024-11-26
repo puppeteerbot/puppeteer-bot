@@ -1147,6 +1147,115 @@ class KirkaInfo(commands.Cog):
         except Exception as e:
             await ctx.reply("An error occurred: " + str(e))
 
+    async def level_rewards_core(self, level):
+        response = requests.get(
+            "https://opensheet.elk.sh/1g9hNBnFQ37alV93ON2PI42yZwWrprQ9FpuOsugAspKQ/1"
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if "-" in level:  # Range handling
+            try:
+                start, end = map(int, level.split("-"))
+                if start > end:
+                    return (
+                        "string",
+                        "Invalid range! Start level must be less than or equal to end level.",
+                    )
+            except ValueError:
+                return (
+                    "string",
+                    "Invalid range format! Use 'start-end' with integers only.",
+                )
+
+            total_score = 0
+            rewards = []
+            if len(range(start, end + 1)) > 25:
+                return (
+                    "string",
+                    "You can only get the range of up to 25 levels at a time!",
+                )
+            embed = discord.Embed(
+                title=f"Level rewards from lvl {start} to {end}:",
+                color=discord.Color.random(),
+            )
+            found_reward = False
+            for lvl in range(start, end + 1):
+                lvl_str = str(lvl)
+                try:
+                    level_data = data[int(lvl_str)]
+                except IndexError:
+                    print(f"Level {lvl} got IndexError")
+                    continue
+                score_needed = int(level_data["Score needed"])
+                total_score += score_needed
+                embed.add_field(
+                    name=f"Level {lvl}:",
+                    value=f"{level_data['Reward']}\nScore needed: {score_needed:,} | Total score needed so far: {total_score:,}",
+                    inline=False,
+                )
+                found_reward = True
+
+            if not found_reward:
+                return ("string", "No levels found in the specified range.")
+            return ("embed", embed)
+        try:
+            int(level)
+        except ValueError:
+            return (
+                "string",
+                "Invalid level! Must be an integer or a range (e.g., '14-83').",
+            )
+
+        embed = discord.Embed(
+            title=f"Level rewards for lvl {level}:", color=discord.Color.random()
+        )
+        try:
+            level_data = data[int(level)]
+        except IndexError:
+            level_data = None
+        if not level_data:
+            return ("string", "Level does not exist!")
+
+        score_needed = int(level_data["Score needed"])
+        reward = level_data["Reward"]
+        embed.add_field(
+            name="Reward Details",
+            value=f"Level {level}: {reward} | Score needed: {score_needed:,}",
+            inline=False,
+        )
+        embed.set_footer(text="Level reward information")
+        return ("embed", embed)
+
+    @commands.command(
+        "lvlreward",
+        aliases=["lvl", "lvr"],
+        description="Get the rewards of a level, or a range of levels",
+    )
+    async def lvlreward_cmmd(self, ctx, level):
+        result_type, result_data = await self.level_rewards_core(level)
+
+        if result_type == "string":
+            await ctx.send(result_data)
+        elif result_type == "embed":
+            await ctx.send(embed=result_data)
+
+    @discord.slash_command(
+        name="lvlreward",
+        description="Get the rewards of a level, or a range of levels",
+        integration_types={
+            discord.IntegrationType.user_install,
+            discord.IntegrationType.guild_install,
+        },
+    )
+    async def lvlreward_slash(self, ctx, level: str):
+        result_type, result_data = await self.level_rewards_core(level)
+
+        if result_type == "string":
+            await ctx.respond(result_data)
+        elif result_type == "embed":
+            await ctx.respond(embed=result_data)
+
 
 def setup(bot):
     bot.add_cog(KirkaInfo(bot))
