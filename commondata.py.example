@@ -13,6 +13,7 @@ DiscordBot_subdescriptions = {
     "Engine": "Made with python 3.12.6 64-bit, pycord, irrvlo's API for some stuff, SherrifCarry's kirkajs (forked for python), lukeskywalk's api, and others...",
     "Legal Info": "This bot is not associated with kirka.io, irrvlo, or any other possibly implied party.\nThis bot has been made as a hobby project and all complaints should be directed to i_am_called_glitchy directly.\n-# dont bother with my email i dont check that.",
 }
+connectionString = "mongodb+srv://user:password@host"  # mongodb
 glitchyKirkaBadges = [
     "https://i.imgur.com/JhMlisg.png",
     "https://i.imgur.com/PePV8tf.png",
