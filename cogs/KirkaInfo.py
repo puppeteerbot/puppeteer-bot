@@ -85,9 +85,13 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
         "MZFCNO": "https://i.imgur.com/8LVz09U.jpeg",
         "Y2OOB2": KirkaBackgrounds["ttvbro"],
     }
-    bots = ["YUM43P", "Y2OOB2"]
+    bots = ["YUM43P", "Y2OOB2", "694TAJ"]
     if shortId in bots:
         Role = "BOT"
+
+    dam = ["985CBJ"]
+    if shortId in dam:
+        Role = "Crazy"
 
     data_to_return = {
         "Badges": userBadges.get(
