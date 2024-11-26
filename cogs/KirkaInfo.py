@@ -95,7 +95,6 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
         ],
         "QYRPV0": [KirkaBadges["ReverieLeader"], "https://i.imgur.com/dOzdhiN.png"],
         "MZFCNO": [KirkaBadges["ReverieLeader"]],
-        "YUM43P": [KirkaBadges["Puppeteer"]],
         "FULOTV": [KirkaBadges["XX5"]],
     }
     userBackgrounds = {
