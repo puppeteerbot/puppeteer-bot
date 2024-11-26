@@ -1147,12 +1147,6 @@ class KirkaInfo(commands.Cog):
         except Exception as e:
             await ctx.reply("An error occurred: " + str(e))
 
-    # save the linked users every minute
-    @tasks.loop(minutes=1)
-    async def save_linked_users(self):
-        with open("linkedusers.json", "w") as f:
-            json.dump(linkedusers, f)
-
 
 def setup(bot):
     bot.add_cog(KirkaInfo(bot))
