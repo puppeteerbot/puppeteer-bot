@@ -18,6 +18,24 @@ import datetime as dt
 cached_prices = {}
 
 
+def wrap_text(text, font, max_width, draw):
+    """Wrap the text to fit within the max_width."""
+    lines = []
+    words = text.split(" ")
+    current_line = words[0]
+
+    for word in words[1:]:
+        # Check the width of the current line with the new word
+        width = draw.textlength(current_line + " " + word, font=font)
+        if width <= max_width:
+            current_line += " " + word
+        else:
+            lines.append(current_line)
+            current_line = word
+    lines.append(current_line)
+    return lines
+
+
 async def get_user_stats(short_id: str = None, ctx=None):
     try:
         if short_id is None and ctx:
@@ -186,7 +204,7 @@ def generate_clan_image(data, page=0):
         for i in sorted(all_members, key=lambda x: x["allScores"], reverse=True)
     ]
 
-    misc_text = f"Description: {data['description']}\nDiscord: {data['discordLink'] if data.get('discordLink', {}) else None}\nCreated At: {data['createdAt'].split('T')[0]}\nTotal Score: {data['allScores']:,}\nAll members: {len(all_members)}"
+    misc_text = f"Discord: {data['discordLink'] if data.get('discordLink', {}) else None}\nCreated At: {data['createdAt'].split('T')[0]}\nTotal Score: {data['allScores']:,}\nAll members: {len(all_members)}"
     # and just because yes we're going to add customizability.
     settings = {
         "title": {"color": "white", "font": title_font, "x": 30, "y": 30},
@@ -195,7 +213,10 @@ def generate_clan_image(data, page=0):
         "newbies": {"color": "lime", "font": text_font, "x": 30, "y": 140},
         "all_members": {"color": "white", "font": subtext_font, "x": 30, "y": 220},
         "misc": {"color": "white", "font": subtext_font, "x": 30, "y": 170},
+        "description": {"color": "white", "font": subtext_font, "x": 30, "y": 570},
     }
+    description_text = f"Description: {data['description']}"
+
     # first the background, because...
     if bgimage:
         headers = {"User-Agent": "this is a bot :3"}
@@ -207,7 +228,9 @@ def generate_clan_image(data, page=0):
             image.paste(background, (0, 0))
         else:
             print(f"Failed to load background from {bgimage}: {response.status_code}")
-
+    description_text = wrap_text(
+        description_text, settings["misc"]["font"], max_width=width - 60, draw=draw
+    )
     # draw them
     draw.text(
         (settings["title"]["x"], settings["title"]["y"]),
@@ -238,6 +261,13 @@ def generate_clan_image(data, page=0):
         misc_text,
         font=settings["misc"]["font"],
         fill=settings["misc"]["color"],
+    )
+    print(description_text)
+    draw.text(
+        (settings["description"]["x"], settings["description"]["y"]),
+        "\n".join(description_text),
+        font=settings["description"]["font"],
+        fill=settings["description"]["color"],
     )
     all_members_pages = []
     current_line = ""
