@@ -266,13 +266,6 @@ def generate_clan_image(data, page=0):
         font=settings["misc"]["font"],
         fill=settings["misc"]["color"],
     )
-    print(description_text)
-    draw.text(
-        (settings["description"]["x"], settings["description"]["y"]),
-        "\n".join(description_text),
-        font=settings["description"]["font"],
-        fill=settings["description"]["color"],
-    )
     all_members_pages = []
     current_line = ""
     current_page = 0
@@ -726,7 +719,7 @@ class KirkaInfo(commands.Cog):
         file = discord.File(image, filename="clan.png")
         try:
             await ctx.reply(
-                f"Clan {clan_name} info:\nDiscord link: <{clan_data['discordLink'] if clan_data.get('discordLink') else 'None'}>",
+                f"Clan {clan_name} info:\nDiscord link: <{clan_data['discordLink'] if clan_data.get('discordLink') else 'None'}>\nDescription: {clan_data['description']}",
                 file=file,
                 view=self.ClanView(clan_data, page),
             )
@@ -760,7 +753,7 @@ class KirkaInfo(commands.Cog):
         file = discord.File(image, filename="clan.png")
         try:
             await ctx.respond(
-                f"Clan {clan_name} info:\nDiscord link: <{clan_data['discordLink'] if clan_data.get('discordLink') else 'None'}>",
+                f"Clan {clan_name} info:\nDiscord link: <{clan_data['discordLink'] if clan_data.get('discordLink') else 'None'}>\nDescription: {clan_data['description']}",
                 file=file,
                 view=self.ClanView(clan_data, page),
             )

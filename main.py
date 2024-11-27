@@ -107,6 +107,8 @@ class App(commands.Bot):
         )
 
     async def on_message(self, message):
+        if message.author.id in [1283573606642614285]:  # blacklist
+            return
         if message.author.bot:
             return  # Ignore bot messages
             # Get the dynamic prefix
