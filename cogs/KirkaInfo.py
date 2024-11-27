@@ -402,12 +402,12 @@ def generate_profile_image(data, badges=None, bgimage=None):
     games = data["stats"]["games"]
     score = data["stats"]["scores"]
     losses = games - wins
-    wlr = wins / losses
-    kdr = kills / deaths
-    score_per_kill = score / kills
-    kills_per_game = kills / games
-    deaths_per_game = deaths / games
-    score_per_game = score / games
+    wlr = wins / losses if losses != 0 else 0
+    kdr = kills / deaths if deaths != 0 else 0
+    score_per_kill = score / kills if kills != 0 else 0
+    kills_per_game = kills / games if games != 0 else 0
+    deaths_per_game = deaths / games if games != 0 else 0
+    score_per_game = score / games if games != 0 else 0
 
     textstuff = [
         f"Kills: {kills:,}",
