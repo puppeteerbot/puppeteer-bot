@@ -473,7 +473,7 @@ class Moderation(commands.Cog):
             )
 
     @commands.command(description="Warn a user.", aliases=["w"])
-    @is_owner_or_has_permissions(moderate_members=True)
+    @commands.has_permissions(moderate_members=True)
     @commands.guild_only()
     async def warn(self, ctx, user: discord.Member, *, reason: str):
         """
@@ -482,134 +482,119 @@ class Moderation(commands.Cog):
         if not has_higher_role(ctx, user):
             await ctx.send("You don't have permission to warn this member.")
             return
+
         try:
-            if ctx.guild:
-                await user.send(
-                    f"You have been warned in {ctx.guild.name} for {reason}.\n-# Responsible moderator: {ctx.author.mention}"
-                )
-            else:
-                await user.send(
-                    f"You have been warned for {reason}.\n-# Responsible moderator: {ctx.author.mention}"
-                )
+            await user.send(
+                f"You have been warned in {ctx.guild.name} for: {reason}.\n- Responsible moderator: {ctx.author.mention}"
+            )
             await ctx.message.add_reaction("✅")
         except (discord.errors.Forbidden, discord.errors.HTTPException):
             await ctx.reply("Unable to DM the user.")
             await ctx.send(
-                f"{user.mention} you have been warned for {reason}.\n-# Responsible moderator: {ctx.author.mention}\n-# Server: {ctx.guild.name}"
+                f"{user.mention} you have been warned for: {reason}.\n- Responsible moderator: {ctx.author.mention}"
             )
 
-        warnid = random.randint(1000, 9999)
+        warn_id = f"{ctx.guild.id}-{random.randint(1000, 9999)}"
         warning = {
             "reason": reason,
             "moderator": ctx.author.mention,
             "time": datetime.now().isoformat(),
-            "id": f"{user.id}|{warnid}",
+            "id": warn_id,
             "guild": ctx.guild.id,
-            "guildName": ctx.guild.name,
         }
 
         self.warned_users_collection.update_one(
-            {"_id": str(user.id)}, {"$push": {"warnings": warning}}, upsert=True
+            {"_id": str(user.id)},
+            {"$push": {f"guilds.{ctx.guild.id}.warnings": warning}},
+            upsert=True,
         )
 
-    @commands.command(description="Revoke a warning by warn ID", aliases=["rw"])
-    @is_owner_or_has_permissions(moderate_members=True)
+    @commands.command(description="Revoke a warning by warn ID.", aliases=["rw"])
+    @commands.has_permissions(moderate_members=True)
     async def revoke_warn(self, ctx, warn_id: str):
         """
-        Revoke a warning by warn ID
+        Revoke a warning by warn ID.
         """
-        print(f"Debug: Attempting to revoke warning with ID: {warn_id}")
-        warn_id = warn_id.split("|")
-        if len(warn_id) != 2:
-            print("Debug: Invalid warn ID format")
-            await ctx.send("Invalid warn ID.")
-            return
-        member_id, warn_id = warn_id
-        print(f"Debug: Parsed member_id: {member_id}, warn_id: {warn_id}")
-
-        user_warnings = self.warned_users_collection.find_one({"_id": member_id})
-        if not user_warnings:
-            print(f"Debug: User not found.")
-            await ctx.send("User not found.")
+        guild_id, warn_suffix = warn_id.split("-")
+        if str(ctx.guild.id) != guild_id:
+            await ctx.send("Invalid warn ID for this guild.")
             return
 
-        warning = next(
-            (
-                warn
-                for warn in user_warnings.get("warnings", [])
-                if warn["id"] == f"{member_id}|{warn_id}"
-            ),
-            None,
+        user_with_warning = self.warned_users_collection.find_one(
+            {f"guilds.{ctx.guild.id}.warnings.id": warn_id}
         )
-        if warning is None:
-            print("Debug: Warning not found for the given ID")
-            await ctx.send("Invalid warn ID.")
+        if not user_with_warning:
+            await ctx.send("Warning ID not found.")
             return
 
+        member_id = user_with_warning["_id"]
         member = ctx.guild.get_member(int(member_id))
-        print(f"Debug: Retrieved member object: {member}")
         if not has_higher_role(ctx, member):
             await ctx.send("You don't have permission to revoke this warning.")
             return
 
         self.warned_users_collection.update_one(
             {"_id": member_id},
-            {"$pull": {"warnings": {"id": f"{member_id}|{warn_id}"}}},
+            {"$pull": {f"guilds.{ctx.guild.id}.warnings": {"id": warn_id}}},
         )
-        await ctx.send(f"Warning with ID {member_id}|{warn_id} has been revoked.")
+        await ctx.send(f"Warning with ID {warn_id} has been revoked.")
 
-    @commands.command(
-        description="Get warns for a user, or for everyone.", aliases=["ws"]
-    )
+    @commands.command(description="Get warns for a user or the top warns in the guild.", aliases=["ws"])
     @commands.guild_only()
     async def warns(self, ctx, user: discord.User = None):
         """
-        Get warns for a user, or for everyone in the current guild.
+        Get warns for a user or the top warned users in the current guild.
         """
         if user is None:
             pipeline = [
-                {"$match": {"guild": ctx.guild.id}},
-                {"$unwind": "$warnings"},
-                {"$group": {
-                    "_id": "$warnings.user_id",
-                    "warn_count": {"$sum": 1}
+                {"$match": {f"guilds.{ctx.guild.id}": {"$exists": True}}},
+                {"$project": {
+                    "_id": 1,
+                    "warn_count": {"$size": f"$guilds.{ctx.guild.id}.warnings"},
                 }},
                 {"$sort": {"warn_count": -1}},
-                {"$limit": 5}
+                {"$limit": 5},
             ]
-            top_warned_users = await self.warned_users_collection.aggregate(pipeline).to_list(length=5)
+            top_warned_users = self.warned_users_collection.aggregate(pipeline)
 
-            embed = discord.Embed(
+            embed = Embed(
                 title=f"Top 5 Warned Users in {ctx.guild.name}",
                 color=discord.Color.red(),
             )
-            for user in top_warned_users:
-                userObject = await self.bot.get_or_fetch_user(int(user["_id"]))
-                if userObject:
+            for user_data in top_warned_users:
+                user_obj = await self.bot.get_or_fetch_user(int(user_data["_id"]))
+                if user_obj:
                     embed.add_field(
-                        name=f"{userObject.name}",
-                        value=f"Warns: { user['warn_count']}",
+                        name=f"{user_obj.name}",
+                        value=f"Warns: {user_data['warn_count']}",
                         inline=False,
                     )
             await ctx.send(embed=embed)
         else:
-            user_warnings = self.warned_users_collection.find_one(
-                {"_id": str(user.id), "guild": ctx.guild.id}
+            user_data = self.warned_users_collection.find_one(
+                {"_id": str(user.id), f"guilds.{ctx.guild.id}": {"$exists": True}}
             )
-            if not user_warnings or not user_warnings.get("warnings"):
+            if not user_data or not user_data["guilds"][str(ctx.guild.id)]["warnings"]:
                 await ctx.send(f"{user.name} has no warns in {ctx.guild.name}.")
             else:
-                embed = discord.Embed(
+                embed = Embed(
                     title=f"Warns for {user.name}#{user.discriminator} in {ctx.guild.name}",
                     color=discord.Color.red(),
                 )
                 warnings = sorted(
-                    user_warnings["warnings"], key=lambda x: x["time"], reverse=True
+                    user_data["guilds"][str(ctx.guild.id)]["warnings"],
+                    key=lambda x: x["time"],
+                    reverse=True,
                 )
                 for counter, warn in enumerate(warnings, 1):
                     embed.add_field(
                         name=f"Case #{counter}:",
-                        value=f"Reason: {warn['reason']}\nModerator: {warn['moderator']}\nTime: {warn['time']}\nWarn ID: {warn['id']}",
+                        value=(
+                            f"Reason: {warn['reason']}\n"
+                            f"Moderator: {warn['moderator']}\n"
+                            f"Time: {warn['time']}\n"
+                            f"Warn ID: {warn['id']}"
+                        ),
                         inline=True,
                     )
                 await ctx.send(embed=embed)
