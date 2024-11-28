@@ -1150,7 +1150,7 @@ class KirkaInfo(commands.Cog):
             print(f"Response: {response}")
 
     @commands.command(
-        name="trades", aliases=["t"], description="Get trades from lukeskywalk's API"
+        name="trades", description="Get trades from lukeskywalk's API"
     )
     async def trades(self, ctx, trade_id: int):
         try:
