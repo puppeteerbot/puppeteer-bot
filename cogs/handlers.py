@@ -1,7 +1,7 @@
-import discord
-from discord.ext import commands
 from commondata import *
-
+from discord.ext import commands
+from discord import Interaction
+from discord.errors import ApplicationCommandInvokeError
 
 class ErrorHandler(commands.Cog):
     def __init__(self, bot):
@@ -10,51 +10,92 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.errors.MissingRequiredArgument):
-            await ctx.send(
-                f"Oops! You're missing a required argument: {error.param.name}. "
-                f"Please check the command usage and try again."
+            response = Response(
+                content=f"Oops! You're missing a required argument: `{error.param.name}`. "
+                        "Please check the command usage and try again."
             )
-        # permission error
+            await response.send(ctx)
+
         elif isinstance(error, commands.errors.MissingPermissions):
-            await ctx.send(
-                f"Oops! You don't have permission to use this command.\n "
-                f"Please check your permissions and try again."
+            response = Response(
+                content="Oops! You don't have permission to use this command.\n"
+                        "Please check your permissions and try again."
             )
-        # fucked arguments
+            await response.send(ctx)
+
         elif isinstance(error, commands.errors.BadArgument):
-            await ctx.send(
-                f"Oops! You've entered an invalid argument: {error}. \n \
-                           Please check the command usage and try again."
+            response = Response(
+                content=f"Oops! You've entered an invalid argument: `{error}`.\n"
+                        "Please check the command usage and try again."
             )
-        # command not found
+            await response.send(ctx)
+
         elif isinstance(error, commands.errors.CommandNotFound):
             pass
-        # not owner
+
         elif isinstance(error, commands.errors.NotOwner):
-            # dm glitchy
-            message = f"someone decided to use a restricted command, he's {ctx.author.mention} and the command was {ctx.command.name}."
-            print(message)
-        # guild only command
-        elif isinstance(error, commands.errors.NoPrivateMessage):
-            await ctx.reply("Sorry, this command can only be used in servers!")
-        # member not found
-        elif isinstance(error, commands.errors.MemberNotFound):
-            await ctx.send(
-                f"Oops! The member you're trying to mention doesn't exist. "
-                f"Please check the member's name and try again."
+            message = (
+                f"Someone tried to use a restricted command. "
+                f"User: {ctx.author.mention}, Command: `{ctx.command.name}`."
             )
-        # debug exception in a command, we ignore this so we dont get duplicate errors
+            print(message)
+
+        elif isinstance(error, commands.errors.NoPrivateMessage):
+            response = Response(content="Sorry, this command can only be used in servers!")
+            await response.send(ctx)
+
+        elif isinstance(error, commands.errors.MemberNotFound):
+            response = Response(
+                content="Oops! The member you're trying to mention doesn't exist. "
+                        "Please check the member's name and try again."
+            )
+            await response.send(ctx)
+
         elif (
             isinstance(error, commands.errors.CommandInvokeError)
             and error.original == DebugException
         ):
             ...
-        # other errors
+
         else:
-            await ctx.send(
-                f"Oops! Something went wrong. Please try again later. {error.original}"
+            response = Response(
+                content=f"Oops! Something went wrong. Please try again later.\n"
+                        f"Error: `{error.original}`"
             )
-            raise error.original  # notify the devs
+            await response.send(ctx)
+            raise error.original
+
+    @commands.Cog.listener()
+    async def on_application_command_error(self, interaction: Interaction, error):
+        if isinstance(error, ApplicationCommandInvokeError):
+            response = Response(
+                content=f"Oops! Something went wrong while executing the command.\n"
+                        f"Error: `{error.original}`",
+                ephemeral=True  # Send error privately
+            )
+            await response.send(interaction)
+            raise error.original
+        elif isinstance(error, commands.errors.MissingPermissions):
+            response = Response(
+                content="Oops! You don't have permission to use this command.\n"
+                        "Please check your permissions and try again.",
+                ephemeral=True
+            )
+            await response.send(interaction)
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
+            response = Response(
+                content="A required argument is missing for this command.\n"
+                        "Please check the command usage and try again.",
+                ephemeral=True
+            )
+            await response.send(interaction)
+        else:
+            response = Response(
+                content="An unexpected error occurred. Please try again later.",
+                ephemeral=True
+            )
+            await response.send(interaction)
+            raise error.original
 
 
 def setup(bot):
