@@ -74,7 +74,7 @@ class ErrorHandler(commands.Cog):
                 ephemeral=True  # Send error privately
             )
             await response.send(interaction)
-            raise error.original
+            raise error
         elif isinstance(error, commands.errors.MissingPermissions):
             response = Response(
                 content="Oops! You don't have permission to use this command.\n"
@@ -95,7 +95,7 @@ class ErrorHandler(commands.Cog):
                 ephemeral=True
             )
             await response.send(interaction)
-            raise error.original
+            raise error
 
 
 def setup(bot):
