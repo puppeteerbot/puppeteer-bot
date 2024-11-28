@@ -1,4 +1,8 @@
 from os.path import exists
+from discord import Embed, File, Interaction as _5, _6, _7
+from discord.ext.commands import Context as _4
+from typing import Optional, List, Union as _1, _2, _3
+
 
 if exists("./.test_flag"):
     DiscordToken = "Unstable bot token"
@@ -42,6 +46,47 @@ class DebugException(BaseException):
     def __init__(self, message, *args, **kwargs):
         self.message = message
         super().__init__(*args, **kwargs)
+
+
+class Response:
+    def __init__(
+        self,
+        content: _1[str] = None,
+        embeds: _1[List[_5]] = None,
+        files: _1[List[_6]] = None,
+        ephemeral: bool = False,
+        meta: any = None,  # just in case
+    ):
+        self.content: _1[str] = content
+        self.embeds: _2[_5] = embeds if embeds else []
+        self.files: _2[_6] = files if files else []
+        self.ephemeral: bool = ephemeral
+        self.meta: any = None
+
+    async def send(self, target: _4 | _5):
+        if isinstance(target, _4):  # Prefix command context
+            await target.send(
+                content=self.content,
+                embeds=self.embeds,
+                files=self.files,
+            )
+        elif isinstance(target, _5):  # Slash command or button interaction
+            if not target.response.is_done():
+                await target.response.send_message(
+                    content=self.content,
+                    embeds=self.embeds,
+                    files=self.files,
+                    ephemeral=self.ephemeral,
+                )
+            else:
+                await target.followup.send(
+                    content=self.content,
+                    embeds=self.embeds,
+                    files=self.files,
+                    ephemeral=self.ephemeral,
+                )
+        else:
+            raise TypeError("Unsupported target type. Must be Context or Interaction.")
 
 
 # :D Welcome to puppeteer's development team!

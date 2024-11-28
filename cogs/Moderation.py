@@ -1,23 +1,9 @@
 from commondata import *
 import discord
 from discord.ext import commands
-from datetime import timedelta, datetime
-import asyncio
-import json
-import os
+from datetime import datetime
 import random
-
-
-def is_owner_or_has_permissions(**perms):
-    original_check = commands.has_permissions(**perms).predicate
-
-    async def extended_check(ctx):
-        if ctx.author.id in owners:
-            return True
-        return await original_check(ctx)
-
-    return commands.check(extended_check)
-
+import typing
 
 def has_higher_role(ctx, target_member):
     """
@@ -45,44 +31,40 @@ def has_higher_role(ctx, target_member):
     except Exception as e:
         raise e
 
+async def create_muted_role(ctx):
+        content = "Info: Creating muted role..."
+        muted_role = await ctx.guild.create_role(
+            name="🔇 | Muted", reason="Mute role creation"
+        )
+        categories = 0
+        channels = 0
+        permissions = {
+            "send_messages": False,
+            "send_messages_in_threads": False,
+            "create_public_threads": False,
+            "create_private_threads": False,
+            "add_reactions": False,
+            "connect": False,
+            "request_to_speak": False,
+            "speak": False
+        }
+        for category in ctx.guild.categories:
+            await category.set_permissions(muted_role, **permissions)
+            categories += 1
+        for channel in ctx.guild.channels:
+            channels += 1
+            await channel.set_permissions(muted_role, **permissions)
+        muted_role.edit(permissions=permissions)
 
-def parse_duration(duration):
-    """
-    Parse a duration string into a timedelta object.
-
-    Args:
-        duration (str): A string representing a duration (e.g., "1w2d3h4m5s").
-
-    Returns:
-        timedelta: A timedelta object representing the parsed duration, or None if parsing fails.
-    """
-
-    units = {"w": "weeks", "d": "days", "h": "hours", "m": "minutes", "s": "seconds"}
-
-    duration_dict = {}
-    current_number = ""
-
-    for char in duration:
-        if char.isdigit():
-            current_number += char
-        elif char in units:
-            if current_number:
-                duration_dict[units[char]] = int(current_number)
-                current_number = ""
-        else:
-            return None  # Invalid character found
-
-    if current_number:  # If there's a trailing number without a unit
-        return None
-
-    try:
-        return timedelta(**duration_dict)
-    except:
-        return None
-
+        content = f"\
+        {content}\
+        Modified {categories} categories and {channels} channels.\
+        "
+        response = Response(content)
+        return response
 
 class ReportView(discord.ui.View):
-    def __init__(self, bot, *args, **kwargs):
+    def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
         self.report_channels_db = bot.mongo_report_channels
@@ -90,7 +72,7 @@ class ReportView(discord.ui.View):
     @discord.ui.button(
         label="Report", style=discord.ButtonStyle.red, custom_id="report"
     )
-    async def report_button(self, button, interaction):
+    async def report_button(self, _button, interaction):
         # check if we're even running in a guild
         if interaction.guild is None:
             await interaction.respond(
@@ -145,7 +127,7 @@ class ReportModal(discord.ui.Modal):
                 f"You're doing it wron- wait, what what the FUCK *are* you even doing? DebugException raised."
             )
             raise DebugException(
-                f"{interaction.user.id} managed to call the report button even though it's not supposed to be spawned."
+                f"{interaction.user.id} managed to call the report button even though it's not supposed to be spawned oustide guild contexts."
             )
         # check if we even have a report channel
         if not self.report_channels_db.find_one({"_id": interaction.guild.id}):
@@ -175,7 +157,7 @@ class ReportModal(discord.ui.Modal):
             )
             return
         except Exception as e:
-            await intreaction.respond("An unknown error happened.", delete_after=5)
+            await interaction.respond("An unknown error happened.")
             raise e
 
         await interaction.respond(
@@ -187,12 +169,12 @@ class Moderation(commands.Cog):
     """A cog for moderation commands."""
 
     def __init__(self, bot):
-        global warned_users
         self.bot = bot
         # using self.bot.mongo_db, get the warned_users collection, create if not existing
         self.warned_users_collection = self.bot.mongo_warned_users
         self.report_channels_collection = self.bot.mongo_report_channels
 
+    @commands.guild_only()
     @commands.command(description="Compare role hierarchy")
     async def who_is_higher(
         self, ctx, member1: discord.Member, member2: discord.Member = None
@@ -201,8 +183,8 @@ class Moderation(commands.Cog):
         Check who is higher on the role hierarchy.
 
         Usage:
-            !who_is_higher @member1 @member2
-            !who_is_higher @member
+            .who_is_higher @member1 @member2
+            .who_is_higher @member
 
         Arguments:
             member1: The first member to compare.
@@ -211,7 +193,6 @@ class Moderation(commands.Cog):
         try:
             if member2 is None:
                 result = "You" if has_higher_role(ctx, member1) else "They"
-                await ctx.reply(result)
             else:
                 result = (
                     "First member"
@@ -224,24 +205,12 @@ class Moderation(commands.Cog):
                     result = "First member (Owner)"
                 if member2.id == ctx.guild.owner_id:
                     result = "Second member (Owner)"
-                await ctx.reply(result)
+            response = Response(result)
+            await response.send(ctx)
         except Exception as e:
             await ctx.reply(f"An error occurred: {e}")
 
-    @who_is_higher.error
-    async def who_is_higher_error(self, ctx, error):
-        """
-        Error handler for the who_is_higher command.
-        """
-        if isinstance(error, commands.CommandInvokeError):
-            await ctx.send("An error occurred while executing the command.")
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Please provide at least one member to compare.")
-        elif isinstance(error, commands.MemberNotFound):
-            await ctx.send(
-                "Member not found. Please make sure you've mentioned a valid member."
-            )
-
+    @commands.guild_only()
     @commands.command(description="Kick a member.")
     @is_owner_or_has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, softban="no", *, reason=None):
@@ -276,7 +245,7 @@ class Moderation(commands.Cog):
             await member.kick(reason=reason)
             await ctx.send(f"{member.mention} has been kicked by {ctx.author.mention}.")
         else:
-            await member.ban(reason=reason)
+            await member.ban(reason=reason, delete_message_seconds=99999999)
             await ctx.send(
                 f"{member.mention} has been softbanned by {ctx.author.mention}."
             )
@@ -284,7 +253,7 @@ class Moderation(commands.Cog):
 
     @commands.command(description="Ban a member.")
     @is_owner_or_has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.User, *, reason=None):
+    async def ban(self, ctx, member: typing.Union[discord.User, discord.Member] , *, reason=None):
         """
         Ban a member from the server.
 
@@ -309,7 +278,7 @@ class Moderation(commands.Cog):
 
     @commands.command(description="Unban a member.")
     @is_owner_or_has_permissions(ban_members=True)
-    async def unban(self, ctx, *, member):
+    async def unban(self, ctx, *, member: discord.User|str):
         """
         Unban a member from the server.
 
@@ -369,7 +338,7 @@ class Moderation(commands.Cog):
         """
         await ctx.channel.purge(
             limit=amount + 1,
-            check=lambda m: m.author == user if user else lambda m: True,
+            check=lambda m: m.author == user if user else lambda msg: True
         )
         await ctx.send(
             f"{amount} messages have been cleared by {ctx.author.mention}.",
@@ -395,15 +364,9 @@ class Moderation(commands.Cog):
                 await ctx.send("You don't have permission to mute this member.")
                 return
 
-            muted_role = discord.utils.get(ctx.guild.roles, name="🔇 | Muted")
+            muted_role = discord.utils.get(ctx.guild.roles, name=lambda name: "Muted" in name)
             if muted_role is None:
-                await ctx.reply("Info: Creating muted role...")
-                muted_role = await ctx.guild.create_role(
-                    name="🔇 | Muted", reason="Mute role creation"
-                )
-                for category in ctx.guild.categories:
-                    for channel in category.channels:
-                        await channel.set_permissions(muted_role, send_messages=False)
+                await create_muted_role(ctx)
 
             mute_duration = parse_duration(duration)
 
@@ -463,15 +426,9 @@ class Moderation(commands.Cog):
         if not has_higher_role(ctx, member):
             await ctx.send("You don't have permission to unmute this member.")
             return
-        muted_role = discord.utils.get(ctx.guild.roles, name="🔇 | Muted")
+        muted_role = discord.utils.get(ctx.guild.roles, name=lambda name: "Muted" in name)
         if muted_role is None:
-            await ctx.reply("Info: Creating muted role...")
-            muted_role = await ctx.guild.create_role(
-                name="🔇 | Muted", reason="Mute role creation"
-            )
-            for category in ctx.guild.categories:
-                for channel in category.channels:
-                    await channel.set_permissions(muted_role, send_messages=False)
+            await create_muted_role(ctx)
         was_muted = False
         if muted_role in member.roles:
             await member.remove_roles(muted_role)
@@ -492,14 +449,6 @@ class Moderation(commands.Cog):
         else:
             await ctx.reply(f"{member.mention} was not muted.")
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        # n word check
-        if "nigger" in message.content.lower():
-            await message.add_reaction("👀")
-            await message.reply(
-                f"{message.author.mention} yeah ur cooked buddy with the n word, mods get over here."
-            )
 
     @commands.command(
         description="Warn a user verbally, don't save.", aliases=["vwarn", "vw"]
@@ -526,7 +475,7 @@ class Moderation(commands.Cog):
     @commands.command(description="Warn a user.", aliases=["w"])
     @is_owner_or_has_permissions(moderate_members=True)
     @commands.guild_only()
-    async def warn(self, ctx, user: discord.User, *, reason: str):
+    async def warn(self, ctx, user: discord.Member, *, reason: str):
         """
         Warn a user.
         """
@@ -620,14 +569,15 @@ class Moderation(commands.Cog):
         if user is None:
             pipeline = [
                 {"$match": {"guild": ctx.guild.id}},
-                {"$project": {"_id": 1, "warn_count": {"$size": "$warnings"}}},
+                {"$unwind": "$warnings"},
+                {"$group": {
+                    "_id": "$warnings.user_id",
+                    "warn_count": {"$sum": 1}
+                }},
                 {"$sort": {"warn_count": -1}},
-                {"$limit": 5},
+                {"$limit": 5}
             ]
-            top_warned_users = self.warned_users_collection.aggregate(pipeline).to_list(
-                length=5
-            )
-            print(f"Debug: Top 5 warned users in {ctx.guild.name}: {top_warned_users}")
+            top_warned_users = await self.warned_users_collection.aggregate(pipeline).to_list(length=5)
 
             embed = discord.Embed(
                 title=f"Top 5 Warned Users in {ctx.guild.name}",
@@ -686,11 +636,7 @@ class Moderation(commands.Cog):
 
 
 def setup(bot):
-    """
-    Set up the Moderation cog.
-
-    Args:
-        bot (commands.Bot): The bot instance to add the cog to.
-    """
+    # huh it's blind ig
+    # noinspection PyTypeChecker
     bot.add_view(ReportView(bot))
     bot.add_cog(Moderation(bot))

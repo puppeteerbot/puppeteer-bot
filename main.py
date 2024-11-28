@@ -28,8 +28,9 @@ def keep_alive():
     t.start()
 
 
+# noinspection PyUnresolvedReferences
 class App(commands.Bot):
-    def __init__(self, DiscordToken, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         intents = discord.Intents.default()
         intents.message_content = True
         intents.members = True
@@ -43,7 +44,6 @@ class App(commands.Bot):
         self.mongo_report_channels = self.mongo_db["report_channels"]
         self.mongo_prefixes = self.mongo_db["prefixes"]
         self.tags_db = self.mongo_db["tags"]
-        self.DiscordToken = DiscordToken
         self.DiscordPrefix = "."
         self.DiscordBot_owners = owners
         self.fail_notified = False
@@ -125,7 +125,7 @@ class App(commands.Bot):
 
 
 async def main():
-    bot = App(DiscordToken=DiscordToken)
+    bot = App()
     await bot.setup_hook()
     await bot.start(DiscordToken)
 
