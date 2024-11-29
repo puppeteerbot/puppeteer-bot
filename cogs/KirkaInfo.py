@@ -122,36 +122,6 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
     return data_to_return
 
 
-async def get_short_id_from_long_id(long_id):
-    cache_file = "short_id_cache.json"
-    try:
-        with open(cache_file, "r") as f:
-            short_id_cache = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        short_id_cache = {}
-
-    key = long_id[:5]
-    if key in short_id_cache:
-        for item in short_id_cache[key]:
-            if long_id in item:
-                return item[long_id]
-
-    try:
-        stats = await self.KirkaAPI.get_stats_long_id(long_id)
-        if "shortId" in stats:
-            short_id = stats["shortId"]
-            if key not in short_id_cache:
-                short_id_cache[key] = []
-            short_id_cache[key].append({long_id: short_id})
-            with open(cache_file, "w") as f:
-                json.dump(short_id_cache, f)
-            return short_id
-        else:
-            return None
-    except Exception as e:
-        print(f"Error getting short ID: {str(e)}")
-        return None
-
 
 def generate_clan_image(data, page=0):
     # Create a blank image
