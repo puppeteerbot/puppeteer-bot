@@ -36,6 +36,7 @@ KirkaBadges = {
 }
 KirkaBackgrounds = {
     "Skynet": "https://i.imgur.com/NxItcCc.png",
+    "Sniper": "https://irrvlo.xyz/snipergecko.png",
     "Glitchedbg": "https://i.imgur.com/IZ2tC5C.jpeg",
     # "TTV": "https://i.imgur.com/MJ13qJi.png"
     "TTV": "https://cdn.discordapp.com/avatars/1169111190824308768/5019045e780fd069aa2f36bddd72847c.png?size=1024",
