@@ -99,6 +99,7 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
     }
     userBackgrounds = {
         "B0TMFC": KirkaBackgrounds["Glitchedbg"],
+        "T57L43": KirkaBackgrounds["Flow"],
         "ZSE1GS": KirkaBackgrounds["Glitchedbg"],
         "YUM43P": KirkaBackgrounds["Skynet"],
         "985CBJ": KirkaBackgrounds["TTV"],
