@@ -289,7 +289,6 @@ class Moderation(commands.Cog):
             member: The member to unban (user ID or username#discriminator).
         """
         try:
-            banned_users = [ban_entry async for ban_entry in ctx.guild.bans()]
             user = discord.Object(id=member.id)
             await ctx.guild.unban(user)
             await ctx.send(
