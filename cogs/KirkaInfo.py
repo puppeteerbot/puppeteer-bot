@@ -11,7 +11,6 @@ import requests
 from requests.utils import quote
 import io
 from io import BytesIO
-from discord.ext import tasks
 import tradeParser
 import datetime as dt
 
@@ -77,7 +76,6 @@ async def get_user_stats(short_id: str = None, ctx=None):
         return file, f"Stats for #{short_id}:"
     except Exception as e:
         raise e
-        return f"An error occurred: {str(e)}"
 
 
 def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command yahoo
@@ -132,19 +130,18 @@ def generate_clan_image(data, page=0):
     # Define fonts
     title_font = load_font(36)
     text_font = load_font(20)
-    small_font = load_font(18)
+    # small_font = load_font(18) # unused
     subtext_font = load_font(14)
 
     # define colors
-    title_color = "white"
-    stroke_color = "black"
-    text_color = "white"
-    clan_color = hex_to_rgb("7a00ffff")
-    cyan_color = hex_to_rgb("01ffffff")
+    # title_color = "white"
+    # stroke_color = "black"
+    # text_color = "white"
+    # clan_color = hex_to_rgb("7a00ffff")
+    # cyan_color = hex_to_rgb("01ffffff") # unused
     # prepare strings
     print(data)
     title_text = f"Clan: {data['name']}"
-    bio_text = data["description"]
     leader = None
     for i in data["members"]:
         if i["role"] == "LEADER":
@@ -160,8 +157,6 @@ def generate_clan_image(data, page=0):
             officers_score += i["allScores"]
 
     officers_text = f"{len(officers)} Officers, Score per officer (avg): {officers_score // len(officers) if len(officers) != 0 else 0:,}"
-    members = []
-    member_scores = 0
     members = sorted(
         [i for i in data["members"] if i["role"] == "NEWBIE"],
         key=lambda x: x["allScores"],
@@ -189,7 +184,6 @@ def generate_clan_image(data, page=0):
         "misc": {"color": "white", "font": subtext_font, "x": 30, "y": 170},
         "description": {"color": "white", "font": subtext_font, "x": 30, "y": 570},
     }
-    description_text = f"Description: {data['description']}"
 
     # first the background, because...
     if bgimage:
@@ -202,9 +196,6 @@ def generate_clan_image(data, page=0):
             image.paste(background, (0, 0))
         else:
             print(f"Failed to load background from {bgimage}: {response.status_code}")
-    description_text = wrap_text(
-        description_text, settings["misc"]["font"], max_width=width - 60, draw=draw
-    )
     # draw them
     draw.text(
         (settings["title"]["x"], settings["title"]["y"]),
@@ -237,7 +228,6 @@ def generate_clan_image(data, page=0):
         fill=settings["misc"]["color"],
     )
     all_members_pages = []
-    current_line = ""
     current_page = 0
     members_per_page = 10
     members_processed = 0
@@ -353,7 +343,6 @@ def generate_profile_image(data, badges=None, bgimage=None):
     bio = data["bio"]
     # draw a nice rounded box around it and pack it using both x and y space
     if bio:
-        text_length = draw.textlength(bio, font=subtext_font) + 20
         bio_x = 50 + clantextlength + 20  # Add some padding between clan and bio
         # draw.rounded_rectangle((bio_x, 80, bio_x + text_length + 20, 80 + 25), fill=0x101010, radius=5)
         draw.text(
@@ -428,7 +417,7 @@ def generate_profile_image(data, badges=None, bgimage=None):
                 if badge_url.startswith("data:image/"):
                     # Parse the base64 data
                     image_data = badge_url.split(",")[1]
-                    badge = Image.open(BytesIO(base64.b64decode(image_data))).resize(
+                    badge = Image.open(BytesIO(base64.b64decode(image_data))).resize( # FIXME: linter screams at me will fix later
                         (badge_size, badge_size)
                     )
                 else:
@@ -458,7 +447,6 @@ def generate_profile_image(data, badges=None, bgimage=None):
     xp_bar_border = 5
     xp_bar_fill_color = (30, 30, 30)
     xp_bar_progress_color = "red"
-    xp_bar_progress_outline_color = "red"
 
     print(f"DEBUG: Drawing XP bar for user {data['name']}#{data['shortId']}")
     draw.rectangle((x, y, x + xp_bar_width, y + xp_bar_height), fill=xp_bar_fill_color)
@@ -626,7 +614,6 @@ class KirkaInfo(commands.Cog):
             member_id = selected_member["user"]["id"]
             print(f"DEBUG: Member ID: {member_id}")
             # fetch the data
-            api = KirkaAPI()
             try:
                 member_data = requests.get(
                     f"https://kirka.irrvlo.xyz/_next/data/Qj7Evkvz7SgKQYk1Q4HmZ/users/{member_id}.json"
@@ -680,7 +667,7 @@ class KirkaInfo(commands.Cog):
             await ctx.send(f"Clan '{clan_name}' not found.")
             return
         if clan_name == "Staff":
-            message = await ctx.reply(
+            await ctx.reply(
                 f"For some reason staff clan breaks half the code... Why? If you're willing to dive deep, take this: ```{json.dumps(clan_data)}```"
             )
             return
@@ -715,7 +702,7 @@ class KirkaInfo(commands.Cog):
             await ctx.respond(f"Clan '{clan_name}' not found.")
             return
         if clan_name == "Staff":
-            message = await ctx.respond(
+            await ctx.respond(
                 f"For some reason staff clan breaks half the code... Why? If you're willing to dive deep, take this: ```{json.dumps(clan_data)}```"
             )
             return
@@ -1029,7 +1016,7 @@ class KirkaInfo(commands.Cog):
             ]:  # we do it like this because Message does not have .get() and we dont want attr errors
                 return
 
-        item_names = re.findall(r"\[(.*?)\]", message.content)
+        item_names = re.findall(r"\[(.*?)]", message.content)
         if not item_names:
             return
         if cached_prices is None:
@@ -1090,9 +1077,9 @@ class KirkaInfo(commands.Cog):
                 )
 
             if (
-                bvl_formatted != "Unknown"
-                or yzz_formatted != "Unknown"
-                or rev_formatted != "Unknown"
+                bvl_formatted != "Unknown" # V
+                or yzz_formatted != "Unknown" # i can ignore these, right?
+                or rev_formatted != "Unknown" # ^
             ):
                 response.append(
                     f"{item_name} price: {bvl_formatted} (bvl), {yzz_formatted} (yzz), {rev_formatted} (rev)"
