@@ -98,6 +98,7 @@ def get_cosmetics(shortId, inReverie, Role):  # cosmetics for profile command ya
         "FULOTV": [KirkaBadges["XX5"]],
     }
     userBackgrounds = {
+        "SNIPER": KirkaBackgrounds["Sniper"],
         "B0TMFC": KirkaBackgrounds["Glitchedbg"],
         "T57L43": KirkaBackgrounds["Flow"],
         "ZSE1GS": KirkaBackgrounds["Glitchedbg"],
