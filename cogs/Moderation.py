@@ -278,7 +278,7 @@ class Moderation(commands.Cog):
 
     @commands.command(description="Unban a member.")
     @is_owner_or_has_permissions(ban_members=True)
-    async def unban(self, ctx, *, member: discord.User|str):
+    async def unban(self, ctx, *, member: discord.User):
         """
         Unban a member from the server.
 
@@ -290,23 +290,11 @@ class Moderation(commands.Cog):
         """
         try:
             banned_users = [ban_entry async for ban_entry in ctx.guild.bans()]
-            if member.isdigit():
-                user = discord.Object(id=int(member))
-                await ctx.guild.unban(user)
-                await ctx.send(
-                    f"User with ID {member} has been unbanned by {ctx.author.mention}."
-                )
-            else:
-                name, discriminator = member.split("#")
-                for ban_entry in banned_users:
-                    user = ban_entry.user
-                    if (user.name, user.discriminator) == (name, discriminator):
-                        await ctx.guild.unban(user)
-                        await ctx.send(
-                            f"{user.mention} has been unbanned by {ctx.author.mention}."
-                        )
-                        return
-                await ctx.send(f"User {member} not found in the ban list.")
+            user = discord.Object(id=member.id)
+            await ctx.guild.unban(user)
+            await ctx.send(
+                f"User {member} has been unbanned by {ctx.author.mention}."
+            )
         except ValueError:
             await ctx.send(
                 "Invalid format. Please use either a user ID or username#discriminator."
