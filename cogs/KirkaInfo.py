@@ -383,7 +383,7 @@ def generate_profile_image(data, badges=None, bgimage=None):
         f"Score per game: {score_per_game:.2f}",
         f"Role: {data['role']}",
         f"Scores: {score:,}",
-        f"Created: {data['createdAt']}",
+        f"Created: {dt.datetime.strptime(data['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d %H:%M:%S")}",
         f"Coins: {data['coins']}",
         f"Diamonds: {data['diamonds']}",
     ]
