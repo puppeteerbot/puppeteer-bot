@@ -54,7 +54,7 @@ async def create_muted_role(ctx):
         for channel in ctx.guild.channels:
             channels += 1
             await channel.set_permissions(muted_role, **permissions)
-        muted_role.edit(permissions=permissions)
+        await muted_role.edit(permissions=permissions)
 
         content = f"\
         {content}\
