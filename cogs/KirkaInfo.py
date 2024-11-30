@@ -1244,6 +1244,7 @@ class KirkaInfo(commands.Cog):
         },
     )
     async def lvlreward_slash(self, ctx, level: str):
+        await ctx.defer()
         result_type, result_data = await self.level_rewards_core(level)
 
         if result_type == "string":
